@@ -8,9 +8,9 @@ It is not a fun parse transform.
 **Author**: Uvarov Michael (freeakk@gmail.com)
 
 
-.. image:: https://secure.travis-ci.org/freeakk/chicha.png?branch=master
+.. image:: https://secure.travis-ci.org/mad-cocktail/chicha.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/freeakk/chicha
+    :target: http://travis-ci.org/mad-cocktail/chicha
 
 
 Allows use "atom/1" as a short form of "fun atom/1".
