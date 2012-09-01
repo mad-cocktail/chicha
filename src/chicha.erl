@@ -1,3 +1,6 @@
+%%% @doc Lets split the atom! It is a parse transfrom.
+%%% You cannot divide the number by an integer in Erlang.
+%%% "atom/1" can be used as a short form of "fun atom/1".
 -module(chicha).
 -export([parse_transform/2]).
 
@@ -44,6 +47,7 @@ search_operator(Tree) ->
         _Type -> Skip
     end.
 
+
 is_fun_name_delim_operator(Tree) ->
     Op = op_name(Tree),
     LT = node_type(left(Tree)),
@@ -55,7 +59,19 @@ is_fun_name_delim_operator(Tree) ->
 replace_operator(Tree) ->
     Name  = left(Tree),
     Arity = right(Tree),
-    copy_pos(Tree, erl_syntax:implicit_fun(Name, Arity)).
+    IFn =
+    case node_type(Name) of
+        %% Name is "Module:Body". Module is an argument.
+        module_qualifier -> 
+            erl_syntax:implicit_fun(
+                erl_syntax:module_qualifier_argument(Name),
+                erl_syntax:module_qualifier_body(Name),
+                Arity);
+        %% Name is a FunName.
+        atom ->
+            erl_syntax:implicit_fun(Name, Arity)
+    end,
+    copy_pos(Tree, IFn).
 
 
 copy_pos(From, To) ->
