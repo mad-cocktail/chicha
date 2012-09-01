@@ -8,7 +8,7 @@
 parse_transform(Forms, _Options) ->
     F  = fun search_operator/1,                                
     X = [postorder(F, Tree) || Tree <- Forms],                    
-    io:format(user, "Before:\t~p\n\nAfter:\t~p\n", [Forms, X]),   
+%   io:format(user, "Before:\t~p\n\nAfter:\t~p\n", [Forms, X]),   
     X.                                                            
                                                               
 
