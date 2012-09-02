@@ -6,11 +6,11 @@
 
 
 parse_transform(Forms, _Options) ->
-    F  = fun search_operator/1,                                
-    X = [postorder(F, Tree) || Tree <- Forms],                    
-%   io:format(user, "Before:\t~p\n\nAfter:\t~p\n", [Forms, X]),   
-    X.                                                            
-                                                              
+    F  = fun(X) -> erl_syntax:revert(search_operator(X)) end,
+    X = [erl_syntax_lib:map(F, Tree) || Tree <- Forms],
+%   io:format(user, "Before:\t~p\n\nAfter:\t~p\n", [Forms, X]),
+    X.
+
 
 left(X) ->
     erl_syntax:infix_expr_left(X).
@@ -62,7 +62,7 @@ replace_operator(Tree) ->
     IFn =
     case node_type(Name) of
         %% Name is "Module:Body". Module is an argument.
-        module_qualifier -> 
+        module_qualifier ->
             erl_syntax:implicit_fun(
                 erl_syntax:module_qualifier_argument(Name),
                 erl_syntax:module_qualifier_body(Name),
@@ -77,21 +77,4 @@ replace_operator(Tree) ->
 copy_pos(From, To) ->
     Pos = erl_syntax:get_pos(From),
     erl_syntax:set_pos(To, Pos).
-
-
-postorder(F, Form) ->                                           
-    NewTree =                                                   
-        case erl_syntax:subtrees(Form) of                       
-        [] ->                                                   
-            Form;                                               
-        List ->                                                 
-            Groups = [handle_group(F, Group) || Group <- List], 
-            Tree2 = erl_syntax:update_tree(Form, Groups),       
-            Form2 = erl_syntax:revert(Tree2),                   
-            Form2                                               
-        end,                                                    
-    F(NewTree).                                                 
-                                                                
-handle_group(F, Group) ->                       
-    [postorder(F, Subtree) || Subtree <- Group].
 
